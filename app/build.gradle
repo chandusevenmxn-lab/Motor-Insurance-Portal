@@ -1,0 +1,76 @@
+plugins {
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kotlinCompose)
+}
+
+android {
+    namespace 'com.example.motor_insurance_portal'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.example.motor_insurance_portal"
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+    buildFeatures {
+        compose true
+    }
+}
+
+dependencies {
+    implementation(libs.androidxCoreKtx)
+    implementation(libs.androidxLifecycleRuntimeKtx)
+    implementation(libs.androidxActivityCompose)
+    implementation(platform(libs.androidxComposeBom))
+    implementation(libs.androidxUi)
+    implementation(libs.androidxUiGraphics)
+    implementation(libs.androidxUiToolingPreview)
+    implementation(libs.androidxMaterial3)
+
+    // Hilt
+    implementation(libs.hiltAndroid)
+    ksp(libs.hiltCompiler)
+    implementation(libs.hiltNavigationCompose)
+
+    // Retrofit & Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofitSerialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttpLogging)
+
+    // Kotlin Serialization
+    implementation(libs.kotlinxSerializationJson)
+
+    // Navigation
+    implementation(libs.androidxNavigationCompose)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidxJunit)
+    androidTestImplementation(libs.androidxEspressoCore)
+    androidTestImplementation(platform(libs.androidxComposeBom))
+    androidTestImplementation(libs.androidxUiTestJunit4)
+    debugImplementation(libs.androidxUiTooling)
+    debugImplementation(libs.androidxUiTestManifest)
+}

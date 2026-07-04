@@ -1,0 +1,8 @@
+build
+.gradle
+/.m2
+.git
+node_modules
+frontend
+**/tmp
+**/logs
