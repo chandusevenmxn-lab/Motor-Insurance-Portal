@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Motor Insurance Portal</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; padding: 2rem; background: #f5f7fb; color: #1f2937; }
+      .container { max-width: 800px; margin: 0 auto; }
+      .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); margin-top: 1rem; }
+      h1, h2, h3 { margin: 0 0 1rem 0; }
+      label { display: block; margin-top: 1rem; font-weight: 600; }
+      input, button, select { width: 100%; padding: 0.9rem; margin-top: 0.4rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 1rem; }
+      button { background: #2563eb; color: white; border: none; cursor: pointer; }
+      .hidden { display: none; }
+      .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
+      .tab { padding: 0.8rem 1rem; border-radius: 999px; background: #e2e8f0; cursor: pointer; }
+      .tab.active { background: #2563eb; color: white; }
+      .summary-box { margin-top: 1rem; padding: 1.5rem; border-radius: 12px; background: #eff6ff; border: 1px solid #dbeafe; }
+      .summary-item { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+      .summary-item strong { color: #0f172a; }
+      .notification { margin-top: 1rem; padding: 1rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card" id="loginView">
+        <h1>Motor Insurance Portal</h1>
+        <h2>Login</h2>
+        <form id="loginForm">
+          <label>Username</label>
+          <input id="loginUser" placeholder="admin" required />
+          <label>Password</label>
+          <input id="loginPass" type="password" placeholder="admin" required />
+          <button type="submit">Login</button>
+        </form>
+        <div id="loginError" class="notification hidden"></div>
+      </div>
+
+      <div class="card hidden" id="mainView">
+        <div class="tabs">
+          <div class="tab active" id="tabDashboard">Dashboard</div>
+          <div class="tab" id="tabQuote">Create Quote</div>
+          <div class="tab" id="tabFleet">Fleet Portal</div>
+        </div>
+
+        <div id="dashboardView">
+          <h2>Individual Portal</h2>
+          <p>Welcome to the motor insurance portal. Select a tab to begin.</p>
+          <button id="startQuoteButton">Create New Quote</button>
+        </div>
+
+        <div class="hidden" id="quoteView">
+          <h2>Vehicle Details</h2>
+          <form id="quoteForm">
+            <label>Registration Number</label>
+            <input id="registrationNumber" required />
+            <label>Make</label>
+            <input id="make" required />
+            <label>Model</label>
+            <input id="model" required />
+            <label>Year</label>
+            <input id="year" type="number" required />
+            <label>Vehicle Value</label>
+            <input id="value" type="number" required />
+            <button type="submit">Calculate Premium</button>
+          </form>
+          <div id="quoteResult" class="notification hidden"></div>
+        </div>
+
+        <div class="hidden" id="summaryView">
+          <h2>Quote Summary</h2>
+          <div class="summary-box">
+            <div class="summary-item"><strong>Registration Number:</strong><span id="summaryReg"></span></div>
+            <div class="summary-item"><strong>Make:</strong><span id="summaryMake"></span></div>
+            <div class="summary-item"><strong>Model:</strong><span id="summaryModel"></span></div>
+            <div class="summary-item"><strong>Year:</strong><span id="summaryYear"></span></div>
+            <div class="summary-item"><strong>Vehicle Value:</strong><span id="summaryValue"></span></div>
+            <div class="summary-item"><strong>Estimated Premium:</strong><span id="summaryPremium"></span></div>
+          </div>
+          <button id="confirmQuoteButton">Confirm Proposal & Buy Policy</button>
+          <div id="confirmResult" class="notification hidden"></div>
+        </div>
+
+        <div class="hidden" id="fleetView">
+          <h2>Fleet Motor Insurance Portal</h2>
+          <p>Manage your fleet motor insurance here.</p>
+          <div class="notification">This section is a placeholder for fleet features.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const loginView = document.getElementById('loginView');
+      const mainView = document.getElementById('mainView');
+      const loginForm = document.getElementById('loginForm');
+      const loginError = document.getElementById('loginError');
+      const tabDashboard = document.getElementById('tabDashboard');
+      const tabQuote = document.getElementById('tabQuote');
+      const tabFleet = document.getElementById('tabFleet');
+      const dashboardView = document.getElementById('dashboardView');
+      const quoteView = document.getElementById('quoteView');
+      const summaryView = document.getElementById('summaryView');
+      const fleetView = document.getElementById('fleetView');
+      const startQuoteButton = document.getElementById('startQuoteButton');
+      const quoteForm = document.getElementById('quoteForm');
+      const quoteResult = document.getElementById('quoteResult');
+      const confirmQuoteButton = document.getElementById('confirmQuoteButton');
+      const confirmResult = document.getElementById('confirmResult');
+
+      const summaryReg = document.getElementById('summaryReg');
+      const summaryMake = document.getElementById('summaryMake');
+      const summaryModel = document.getElementById('summaryModel');
+      const summaryYear = document.getElementById('summaryYear');
+      const summaryValue = document.getElementById('summaryValue');
+      const summaryPremium = document.getElementById('summaryPremium');
+
+      const tabElements = [tabDashboard, tabQuote, tabFleet];
+
+      function showView(view) {
+        dashboardView.classList.add('hidden');
+        quoteView.classList.add('hidden');
+        summaryView.classList.add('hidden');
+        fleetView.classList.add('hidden');
+        tabElements.forEach(t => t.classList.remove('active'));
+      }
+
+      function setActiveTab(tab) {
+        tabElements.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      }
+
+      loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const user = document.getElementById('loginUser').value;
+        const pass = document.getElementById('loginPass').value;
+        if (user === 'admin' && pass === 'admin') {
+          loginView.classList.add('hidden');
+          mainView.classList.remove('hidden');
+          setActiveTab(tabDashboard);
+          showView('dashboard');
+          dashboardView.classList.remove('hidden');
+        } else {
+          loginError.textContent = 'Invalid credentials. Use admin/admin.';
+          loginError.classList.remove('hidden');
+        }
+      });
+
+      tabDashboard.addEventListener('click', () => {
+        setActiveTab(tabDashboard);
+        showView('dashboard');
+        dashboardView.classList.remove('hidden');
+      });
+
+      tabQuote.addEventListener('click', () => {
+        setActiveTab(tabQuote);
+        showView('quote');
+        quoteView.classList.remove('hidden');
+      });
+
+      tabFleet.addEventListener('click', () => {
+        setActiveTab(tabFleet);
+        showView('fleet');
+        fleetView.classList.remove('hidden');
+      });
+
+      startQuoteButton.addEventListener('click', () => {
+        setActiveTab(tabQuote);
+        showView('quote');
+        quoteView.classList.remove('hidden');
+      });
+
+      quoteForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = {
+          registrationNumber: document.getElementById('registrationNumber').value,
+          make: document.getElementById('make').value,
+          model: document.getElementById('model').value,
+          year: document.getElementById('year').value,
+          value: document.getElementById('value').value
+        };
+
+        quoteResult.classList.remove('hidden');
+        quoteResult.textContent = 'Submitting request...';
+
+        try {
+          const response = await fetch('http://localhost:8085/motor/v1/quotes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.message || response.statusText);
+          }
+
+          quoteResult.textContent = `Quote submitted successfully. Quote ID: ${data.quoteId || 'N/A'}`;
+          summaryReg.textContent = payload.registrationNumber;
+          summaryMake.textContent = payload.make;
+          summaryModel.textContent = payload.model;
+          summaryYear.textContent = payload.year;
+          summaryValue.textContent = payload.value;
+          summaryPremium.textContent = '$2,450.00';
+
+          setActiveTab(tabQuote);
+          showView('summary');
+          summaryView.classList.remove('hidden');
+        } catch (error) {
+          quoteResult.textContent = `Unable to reach backend: ${error.message}`;
+        }
+      });
+
+      confirmQuoteButton.addEventListener('click', () => {
+        confirmResult.classList.remove('hidden');
+        confirmResult.textContent = 'Policy issued successfully. Returning to dashboard...';
+        setTimeout(() => {
+          setActiveTab(tabDashboard);
+          showView('dashboard');
+          dashboardView.classList.remove('hidden');
+          confirmResult.classList.add('hidden');
+        }, 1500);
+      });
+    </script>
+  </body>
+</html>

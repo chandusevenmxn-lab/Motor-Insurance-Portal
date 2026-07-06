@@ -33,8 +33,25 @@ docker compose logs -f postgres
 
 ### Access points
 
-- Backend API: http://localhost:8080
+- Backend API: http://localhost:8085
 - PostgreSQL: localhost:5432
+- Local frontend preview: http://localhost:5500
+
+## Preview the frontend portal locally
+
+From the workspace root, run a simple static server from the portal's public folder:
+
+```bash
+cd frontend/individual-portal/public
+python -m http.server 5500
+```
+
+Then open `http://localhost:5500` in your browser.
+
+### Login for the preview portal
+
+- Username: `admin`
+- Password: `admin`
 
 ## Build the backend image manually
 
@@ -45,7 +62,7 @@ docker build -f backend/experience-api/Dockerfile -t motor-insurance-api:latest 
 Run it manually:
 
 ```bash
-docker run -d --name motor-insurance-api -p 8080:8080 motor-insurance-api:latest
+docker run -d --name motor-insurance-api -p 8085:8080 motor-insurance-api:latest
 ```
 
 ## Deploy updated changes
